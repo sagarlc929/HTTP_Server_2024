@@ -4,7 +4,7 @@ const path = require("path");
 
 const dataFilePath = path.join(__dirname, "data.json");
 
-// Function to read data from the JSON file
+// rd data
 function readData() {
     if (!fs.existsSync(dataFilePath)) {
         return [];
@@ -13,7 +13,7 @@ function readData() {
     return JSON.parse(data);
 }
 
-// Function to write data to the JSON file
+// wrt data
 function writeData(data) {
     fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 }
@@ -21,7 +21,7 @@ function writeData(data) {
 const server = http.createServer((req, res) => {
     console.log(`Request received: ${req.method} ${req.url}`);
 
-    // POST method to add new name
+    // POST
     if (req.method === "POST" && req.url === "/api/names") {
         let body = "";
         req.on("data", chunk => {
@@ -37,7 +37,7 @@ const server = http.createServer((req, res) => {
                 }
 
                 const data = readData();
-                const id = data.length > 0 ? data[data.length - 1].id + 1 : 1; // Generate unique ID
+                const id = data.length > 0 ? data[data.length - 1].id + 1 : 1; // generate unique ID
                 const newEntry = { name, id };
                 data.push(newEntry);
                 writeData(data);
@@ -49,8 +49,8 @@ const server = http.createServer((req, res) => {
             }
         });
 
-    // PATCH method to edit a name by ID
-    } else if (req.method === "PATCH" && req.url.startsWith("/api/names/")) {
+    // PATCH edit a name by ID
+    } else if (req.method === "PATCH" && req.url.startsWith("/api/names")) {
         const id = parseInt(req.url.split("/").pop());
         let body = "";
         req.on("data", chunk => {
@@ -78,11 +78,11 @@ const server = http.createServer((req, res) => {
             }
         });
 
-    // DELETE method to remove a name by ID
+    // DELETE to remove a name by ID
     } else if (req.method === "DELETE" && req.url.startsWith("/api/names/")) {
         const id = parseInt(req.url.split("/").pop());
         const data = readData();
-        const filteredData = data.filter(entry => entry.id !== id); // Remove entry by ID
+        const filteredData = data.filter(entry => entry.id !== id); // Rv entry by ID
 
         if (data.length !== filteredData.length) {
             writeData(filteredData);
@@ -93,13 +93,29 @@ const server = http.createServer((req, res) => {
             res.end(JSON.stringify({ message: "Entry not found" }));
         }
 
-    // GET method to retrieve all names
+    // GET to retrieve all names
     } else if (req.method === "GET" && req.url === "/api/names") {
         const data = readData();
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(data));
 
-    // Handle invalid routes
+        /*
+         // GET to retrieve a name by ID
+    } else if (method === "GET" && path.startsWith("/api/names/")) {
+        const id = parseInt(path.split("/")[3]); // Extract the ID from the URL
+        const data = readData();
+        const name = data.find(item => item.id === id);
+
+        if (name) {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(name));
+        } else {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Name not found" }));
+        }
+        */
+
+    // Handle invalid rth
     } else {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ message: "Route not found" }));
